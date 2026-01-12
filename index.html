@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>形合わせパズル (Shape Matching Puzzle)</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for a nice playful font -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div id="game-container">
+
+        <header>
+            <button id="settings-btn" aria-label="設定 (Settings)">⚙️</button>
+            <h1>かたちあわせ</h1>
+            <button id="reset-btn" class="hidden">もういちど</button>
+        </header>
+
+        <!-- Hidden SVG Definitions to be used by both Holes and Pieces -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <path id="shape-circle" d="M50,50 m-40,0 a40,40 0 1,0 80,0 a40,40 0 1,0 -80,0" />
+                <polygon id="shape-triangle" points="50,15 90,85 10,85" />
+                <rect id="shape-square" x="15" y="15" width="70" height="70" rx="5" ry="5" />
+                <polygon id="shape-rhombus" points="50,10 90,50 50,90 10,50" />
+                <polygon id="shape-pentagon" points="50,10 90,40 75,90 25,90 10,40" />
+                <path id="shape-cross" d="M35,10 h30 v25 h25 v30 h-25 v25 h-30 v-25 h-25 v-30 h25 z" />
+            </defs>
+        </svg>
+
+        <div id="board">
+            <!-- The holes where pieces need to be dropped -->
+            <!-- Populated by JS -->
+        </div>
+
+        <div id="tray">
+            <!-- The draggable pieces -->
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>せんせい モード (Settings)</h2>
+
+            <div class="setting-group">
+                <h3>かず (Count)</h3>
+                <input type="range" id="shape-count" min="1" max="6" value="6">
+                <span id="shape-count-val">6</span>
+            </div>
+
+            <div class="setting-group">
+                <h3>かたち と いろ (Shapes & Colors)</h3>
+                <div id="shape-settings-list">
+                    <!-- Javascript will populate this -->
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="save-settings">ほぞん (Save)</button>
+                <button id="cancel-settings" class="secondary">キャンセル (Cancel)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Win Overlay -->
+    <div id="win-overlay" class="modal hidden">
+        <div class="modal-content win-content">
+            <h2>🎉 よくできました！ 🎉</h2>
+            <div style="font-size: 3rem; margin: 20px;">⭐ ⭐ ⭐</div>
+            <button id="play-again-btn">もういちど あそぶ</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
