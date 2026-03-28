@@ -1,235 +1,296 @@
 :root {
-    --bg-wood: #deb887;
-    --bg-wood-dark: #cd853f;
-    --hole-color: #5d4037;
-    --piece-shadow: rgba(0, 0, 0, 0.4);
-
-    --color-circle: #e74c3c;
-    --color-triangle: #3498db;
-    --color-square: #2ecc71;
-    --color-rhombus: #9b59b6;
-    --color-pentagon: #f1c40f;
-    --color-cross: #e67e22;
+    --primary-color: #4CAF50;
+    --primary-dark: #388E3C;
+    --bg-grad-start: #E0F7FA;
+    --bg-grad-end: #FCE4EC;
+    --text-color: #333;
+    --white: #FFF;
+    --btn-shadow: 0 4px 0 var(--primary-dark);
 }
 
 * {
     box-sizing: border-box;
-    user-select: none;
-    /* Prevent selection text while dragging */
+    margin: 0;
+    padding: 0;
+    touch-action: manipulation;
 }
 
 body {
-    margin: 0;
-    padding: 0;
     font-family: 'M PLUS Rounded 1c', sans-serif;
+    background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+    color: var(--text-color);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f5f5f5;
-    background-image: radial-gradient(#ddd 1px, transparent 1px);
-    background-size: 20px 20px;
+    min-height: 100dvh;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-#game-container {
+#app-container {
+    width: 100%;
+    max-width: 100%;
+    /* 全画面へ拡張 */
+    height: 100vh;
+    height: 100dvh;
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    width: 100%;
-    max-width: 800px;
-    padding: 20px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-header {
+.screen.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Title Screen */
+.title-text {
+    font-size: 3rem;
+    color: var(--primary-dark);
     text-align: center;
-    margin-bottom: 10px;
-    position: relative;
-    width: 100%;
+    margin-top: 1vh;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+    line-height: 1.3;
 }
 
-/* Settings Button */
-#settings-btn {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    transition: transform 0.2s;
-    padding: 5px;
+.character-img {
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.5);
+    object-fit: cover;
+    margin: 20px 0;
+    border: 6px solid var(--white);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-#settings-btn:hover {
-    transform: translateY(-50%) rotate(45deg);
-    background-color: rgba(255, 255, 255, 0.8);
-}
-
-h1 {
-    color: #5d4037;
-    font-size: 2.5rem;
-    margin: 0 0 10px 0;
-    text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
-}
-
-#board {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 20px;
-    background-color: var(--bg-wood);
-    /* Simple wood texture using repeating linear gradient */
-    background-image:
-        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0px, transparent 2px, transparent 10px),
-        linear-gradient(to bottom, var(--bg-wood), var(--bg-wood-dark));
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow:
-        0 10px 20px rgba(0, 0, 0, 0.3),
-        inset 0 2px 5px rgba(255, 255, 255, 0.3);
-    border: 8px solid #8d6e63;
-}
-
-.hole {
-    width: 120px;
-    height: 120px;
+.menu-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    position: relative;
-    /* Inset style to look like a cutout */
-
+    gap: 30px;
+    width: 90%;
+    max-width: 600px;
 }
 
-.hole svg {
-    width: 100%;
-    height: 100%;
-    fill: var(--hole-color);
-    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5)) inset;
-    /* Inner shadow check logic below */
-}
-
-#tray {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    min-height: 140px;
+.game-mode-section {
+    background: rgba(255, 255, 255, 0.6);
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.5);
     border-radius: 20px;
-    border: 2px dashed #aaa;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mode-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary-dark);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* 文字と王冠の間隔 */
+}
+
+.crown-icon {
+    font-size: 1.6rem;
+}
+
+.level-btn-container {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
     width: 100%;
 }
 
-.piece {
-    width: 120px;
-    height: 120px;
-    cursor: grab;
-    transition: transform 0.2s, filter 0.2s;
-    /* 3D wooden piece effect */
-    filter: drop-shadow(0 5px 0px rgba(0, 0, 0, 0.2));
-    touch-action: none;
-    /* Important for custom drag handling if needed */
-}
-
-.piece:active {
-    cursor: grabbing;
-    transform: scale(1.1);
-    filter: drop-shadow(0 15px 10px rgba(0, 0, 0, 0.3));
-    z-index: 100;
-}
-
-.piece.placed {
-    cursor: default;
-    filter: none;
-    pointer-events: none;
-}
-
-/* Shape Colors - Default, updated by JS */
-.piece[data-shape="circle"] svg {
-    fill: var(--color-circle);
-}
-
-.piece[data-shape="triangle"] svg {
-    fill: var(--color-triangle);
-}
-
-.piece[data-shape="square"] svg {
-    fill: var(--color-square);
-}
-
-.piece[data-shape="rhombus"] svg {
-    fill: var(--color-rhombus);
-}
-
-.piece[data-shape="pentagon"] svg {
-    fill: var(--color-pentagon);
-}
-
-.piece[data-shape="cross"] svg {
-    fill: var(--color-cross);
-}
-
-.piece svg {
-    stroke: rgba(255, 255, 255, 0.4);
-    stroke-width: 3px;
-    width: 100%;
-    height: 100%;
-}
-
-#reset-btn,
-#play-again-btn {
-    background-color: #27ae60;
-    color: white;
+.level-btn {
+    background-color: var(--primary-color);
+    color: var(--white);
     border: none;
-    padding: 10px 20px;
+    border-radius: 12px;
+    padding: 15px 20px;
     font-size: 1.2rem;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 0 #219150;
-    transition: transform 0.1s;
+    font-weight: bold;
     font-family: inherit;
-    margin-top: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--primary-dark);
+    transition: transform 0.1s;
+    flex: 1;
 }
 
-#reset-btn:active,
-#play-again-btn:active,
-#save-settings:active,
-#cancel-settings:active {
+.level-btn:active {
     transform: translateY(4px);
     box-shadow: none;
 }
 
-.hidden {
-    display: none !important;
+.menu-btn,
+.back-btn {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 20px;
+    padding: 15px 40px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    cursor: pointer;
+    box-shadow: var(--btn-shadow);
+    transition: transform 0.1s;
+    line-height: 1.2;
 }
 
-/* Animation for success */
-@keyframes pop {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.2);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+.menu-btn:active,
+.back-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
 }
 
-.pop-anim {
-    animation: pop 0.3s ease-out;
+.furigana {
+    display: block;
+    font-size: 1rem;
+    font-weight: normal;
+    margin-top: 5px;
+}
+
+/* Game Screens Header */
+.header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.back-btn {
+    font-size: 1.2rem;
+    padding: 12px 24px;
+    border-radius: 16px;
+}
+
+.header h2 {
+    font-size: 1.8rem;
+    margin-left: 15px;
+    color: var(--primary-dark);
+    flex-grow: 1;
+    text-align: center;
+}
+
+.level-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 12px;
+    margin-left: 10px;
+    min-width: 90px;
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.level-text {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Game Areas */
+.game-area {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 20px 0 20px;
+    overflow-y: auto;
+}
+
+/* Footer Advice Area */
+.character-footer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-top: 2px solid rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.footer-character-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--white);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-right: 20px;
+    object-fit: cover;
+}
+
+.footer-speech-bubble {
+    position: relative;
+    background: #FFF;
+    border: 3px solid #FFC107;
+    border-radius: 12px;
+    padding: 15px 25px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #333;
+    flex-grow: 1;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.footer-speech-bubble::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 8px 12px 8px 0;
+    border-style: solid;
+    border-color: transparent #FFC107 transparent transparent;
+}
+
+.footer-speech-bubble::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 6px 9px 6px 0;
+    border-style: solid;
+    border-color: transparent #FFF transparent transparent;
 }
 
 /* Modal Styles */
-.modal {
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -240,87 +301,657 @@ h1 {
     justify-content: center;
     align-items: center;
     z-index: 2000;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .modal-content {
-    background-color: #fefefe;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    width: 90%;
-    max-width: 500px;
-    border: 5px solid #deb887;
-}
-
-.win-content {
-    text-align: center;
-    background-color: #fff8e1;
-    border-color: #f1c40f;
-}
-
-.win-content h2 {
-    color: #e67e22;
-    font-size: 2rem;
-}
-
-.setting-group {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
-
-.setting-group h3 {
-    margin-top: 0;
-    color: #5d4037;
-}
-
-#shape-settings-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-}
-
-.shape-option {
+    background-color: var(--white);
+    padding: 30px;
+    border-radius: 24px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    background: #f9f9f9;
-    padding: 8px;
-    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+    width: 400px;
+    transform: scale(1);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.shape-option input[type="color"] {
+.modal-overlay.hidden .modal-content {
+    transform: scale(0.8);
+}
+
+.modal-character-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--primary-color);
+    margin-bottom: -20px;
+    z-index: 2;
+    background-color: var(--white);
+}
+
+.modal-speech-bubble {
+    background: #FFF;
+    border: 3px solid #03A9F4;
+    border-radius: 16px;
+    padding: 20px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 20px;
+    line-height: 1.4;
+    position: relative;
+}
+
+.modal-btn {
+    background-color: #FF9800;
+    color: var(--white);
     border: none;
-    width: 30px;
-    height: 30px;
+    border-radius: 16px;
+    padding: 15px 40px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    font-family: inherit;
     cursor: pointer;
-    background: none;
+    box-shadow: 0 4px 0 #F57C00;
 }
 
-.modal-actions {
+.modal-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* Settings Styles */
+.settings-btn-wrapper {
+    width: 100%;
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    padding: 10px 15px 0 15px;
+    flex-shrink: 0;
 }
 
-#save-settings {
-    background-color: #2980b9;
+.settings-btn {
+    background-color: var(--white);
+    color: #666;
+    border: 2px solid #CCC;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #CCC;
+    z-index: 100;
+}
+
+.settings-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.settings-content {
+    width: 450px;
+}
+
+.settings-content h2 {
+    color: var(--primary-dark);
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+.settings-section {
+    width: 100%;
+    margin-bottom: 25px;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 16px;
+}
+
+.settings-section h3 {
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 1.2rem;
+}
+
+.color-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.color-option {
+    cursor: pointer;
+}
+
+.color-option input[type="radio"] {
+    display: none;
+}
+
+.color-swatch {
+    display: block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.color-option input[type="radio"]:checked+.color-swatch {
+    border-color: #333;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mode-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.mode-option {
+    cursor: pointer;
+    background: #FFF;
+    border: 2px solid #CCC;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.mode-option input[type="radio"] {
+    display: none;
+}
+
+.mode-option input[type="radio"]:checked+span {
+    color: var(--primary-color);
+}
+
+.mode-option:has(input[type="radio"]:checked) {
+    border-color: var(--primary-color);
+    background: #E8F5E9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Step 5 Styles */
+.target-container {
+    /* 端末画面に合わせて最大サイズへ拡大 (幅/高さを最大化) */
+    width: clamp(160px, 30vmin, 320px);
+    height: clamp(160px, 30vmin, 320px);
+    background-color: var(--white);
+    border-radius: 20px;
+    padding: clamp(5px, 2vmin, 15px);
+    margin-bottom: clamp(10px, 4vmin, 40px);
+    border: 4px solid var(--primary-color);
+    position: relative;
+    /* For animation anchor */
+    z-index: 10;
+}
+
+.choices-container {
+    display: flex;
+    gap: clamp(10px, 3vmin, 40px);
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    position: relative;
+}
+
+.choices-container:has(.choice-btn[data-mode="drag"]),
+#step7-choices-container:has(.choice-btn[data-mode="drag"]) {
+    /* ハンドル（25pxはみ出る）同士の重なりを防ぐためにGapを広くする */
+    gap: 55px;
+}
+
+.choice-btn {
+    width: clamp(160px, 30vmin, 320px);
+    height: clamp(160px, 30vmin, 320px);
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.4);
+    /* 透明なカード風 */
+    backdrop-filter: blur(2px);
+    border: 4px solid rgba(0, 0, 0, 0.15); /* ターゲットと完全にサイズを合わせるため4pxに変更 */
+    /* クリアファイルのフチのような表現 */
+    border-radius: 8px;
+    /* カードらしく少し角を立たせる */
+    padding: clamp(5px, 2vmin, 15px);
+    cursor: grab;
+    touch-action: none;
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    position: relative;
+    z-index: 5;
+}
+
+.choice-btn:active,
+.choice-btn.dragging {
+    cursor: grabbing;
+    transform: scale(0.98);
+    box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.15);
+    /* 持ち上げている感じ */
+    background-color: rgba(255, 255, 255, 0.5);
+    /* 持ち上げ中は少し白く */
+    backdrop-filter: blur(0px);
+    /* 持ち上げ中はクリアに */
+}
+
+.choice-btn.correct {
+    border-color: var(--primary-color);
+    background-color: #E8F5E9;
+    transform: scale(1.0) !important;
+    z-index: 20;
+    transition: all 0.2s;
+    /* Snap instantly */
+}
+
+.choice-btn.wrong {
+    animation: shake 0.4s;
+    border-color: #F44336;
+    background-color: #FFEBEE;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+
+    75% {
+        transform: translateX(-5px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* Confetti Effect */
+.confetti {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    top: -20px;
+    z-index: 9999;
+    animation: fall linear forwards;
+    pointer-events: none;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh) rotate(720deg);
+    }
+}
+
+/* Step 6 Styles */
+.step6-model-container {
+    width: clamp(160px, 30vmin, 320px);
+    height: clamp(160px, 30vmin, 320px);
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 4px dashed #999;
+    border-radius: 20px;
+    padding: clamp(5px, 2vmin, 15px);
+    margin-bottom: clamp(10px, 4vmin, 40px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.step6-model-container::before {
+    content: "みほん";
+    position: absolute;
+    top: -30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #666;
+}
+
+.interactive-piece-container {
+    width: clamp(160px, 30vmin, 320px);
+    height: clamp(160px, 30vmin, 320px);
+    background-color: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(2px);
+    border-radius: 8px;
+    padding: clamp(5px, 2vmin, 15px);
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+    border: 4px solid rgba(0, 0, 0, 0.15);
+    cursor: grab;
+    transition: transform 0.1s;
+    position: relative;
+    touch-action: none;
+    z-index: 5;
+}
+
+.interactive-piece-container:active {
+    cursor: grabbing;
+    background-color: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(0px);
+}
+
+/* Rotation Handle (for drag mode) */
+.rotation-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin-left: -20px;
+    margin-top: -20px;
+    background-color: #FF9800;
+    border-radius: 50%;
+    border: 3px solid #FFF;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    display: none;
+    /* Hidden by default, shown in drag mode */
+    justify-content: center;
+    align-items: center;
+    cursor: grab;
+    z-index: 20;
+    /* transform で回転角度に応じた位置に移動（JSから設定） */
+    transform-origin: 20px 20px;
+    transition: transform 0.05s linear;
+    touch-action: none;
+}
+
+.rotation-handle::after {
+    content: "↻";
     color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 3px 0 #1c5980;
+    font-size: 20px;
+    font-weight: bold;
 }
 
-#cancel-settings {
-    background-color: #ccc;
-    color: #333;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 3px 0 #999;
+.rotation-handle:active {
+    cursor: grabbing;
+}
+
+/* Show the handle in drag mode via dataset or class on piece container */
+.interactive-piece-container[data-mode="drag"] .rotation-handle,
+.choice-btn[data-mode="drag"] .rotation-handle {
+    display: flex;
+}
+
+.interactive-piece-container.correct {
+    border-color: var(--primary-color);
+    background-color: #E8F5E9;
+    animation: correct-glow 0.5s;
+    pointer-events: none;
+    cursor: default;
+    /* 正解後は触れない */
+}
+
+@keyframes correct-glow {
+    0% {
+        box-shadow: 0 0 0 rgba(76, 175, 80, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.7);
+    }
+    100% {
+        box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.interactive-piece-container.wrong {
+    animation: shake 0.4s;
+    border-color: #F44336;
+    background-color: #FFEBEE;
+}
+
+@keyframes correct-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(76, 175, 80, 0.7);
+    }
+
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.7);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Step 7 Styles */
+#step7-target-container {
+    width: clamp(160px, 30vmin, 320px);
+    height: clamp(160px, 30vmin, 320px);
+    background-color: var(--white);
+    border-radius: 20px;
+    padding: clamp(5px, 2vmin, 15px);
+    margin-bottom: clamp(10px, 4vmin, 40px);
+    border: 4px solid var(--primary-color);
+    position: relative;
+    z-index: 10;
+}
+
+#step7-choices-container {
+    display: flex;
+    gap: clamp(10px, 3vmin, 40px);
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    position: relative;
+}
+
+.rail-board {
+    background-color: #81C784;
+    /* 草原の色 */
+    border: 6px solid var(--primary-dark);
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.board-cell {
+    width: 100px;
+    height: 100px;
+    border: 1px dashed rgba(255, 255, 255, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.empty-slot {
+    background-color: rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.pieces-container {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    position: relative;
+}
+
+.draggable-piece {
+    width: 100px;
+    height: 100px;
+    cursor: grab;
+    touch-action: none;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+    position: relative;
+    /* Before dragging */
+}
+
+.draggable-piece:active {
+    cursor: grabbing;
+}
+
+.rail-tile {
+    transition: transform 1.2s ease; /* タップ時の回転スピードをさらに遅く（0.4sの3倍 = 1.2s） */
+    pointer-events: none;
+    /* Let drag wrapper handle events */
+}
+
+/* Keep everything responsive */
+@media (max-width: 600px) {
+    .title-text {
+        font-size: 1.8rem;
+        margin-top: 5vh;
+        flex-shrink: 0; /* 縮み防止 */
+    }
+
+    .character-img {
+        width: 120px;
+        height: 120px;
+        margin: 10px 0;
+        flex-shrink: 0; /* 縮み防止 */
+    }
+
+    .menu-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        flex-shrink: 0; /* 縮み防止 */
+    }
+
+    .game-mode-section {
+        padding: 12px;
+        flex-shrink: 0; /* 縮み防止 */
+    }
+
+    .mode-title {
+        font-size: 1.1rem; /* タイトルを少し小さく */
+        margin-bottom: 10px;
+    }
+
+    .level-btn {
+        padding: 10px 15px; /* ボタンを少し小さく */
+        font-size: 1rem;
+    }
+
+    .menu-btn {
+        font-size: 1.4rem;
+        width: 100%;
+    }
+
+    /* ホーム画面のみスクロールを許可 */
+    #title-screen {
+        overflow-y: auto;
+        justify-content: flex-start; /* 上から順に並べる */
+        padding-bottom: 30px; /* 下部に余白 */
+    }
+
+    /* ヘッダー */
+    .header {
+        padding: 10px 15px;
+    }
+    .header h2 {
+        font-size: 1.2rem;
+    }
+    .back-btn {
+        padding: 8px 16px;
+        font-size: 1rem;
+    }
+    .level-info {
+        min-width: 70px;
+        padding: 3px 10px;
+    }
+
+    /* フッター */
+    .character-footer {
+        padding: 8px 15px;
+    }
+    .footer-character-img {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+    }
+    .footer-speech-bubble {
+        padding: 10px 15px;
+        font-size: 1.1rem;
+    }
+
+    /* ゲームエリア */
+    .game-area {
+        padding: 10px;
+        overflow-y: hidden; /* スマホではスクロール禁止（ドラッグ干渉防止） */
+    }
+
+    /* コンテナサイズ調整 */
+    .target-container,
+    .step6-model-container,
+    .interactive-piece-container,
+    #step7-target-container {
+        width: clamp(110px, 26vmin, 160px);
+        height: clamp(110px, 26vmin, 160px);
+        margin-bottom: clamp(5px, 2vmin, 15px);
+    }
+
+    .choice-btn {
+        width: clamp(110px, 26vmin, 160px);
+        height: clamp(110px, 26vmin, 160px);
+    }
+    
+    .choices-container, #step7-choices-container {
+        gap: clamp(8px, 2vmin, 15px);
+    }
+    
+    .choices-container:has(.choice-btn[data-mode="drag"]),
+    #step7-choices-container:has(.choice-btn[data-mode="drag"]) {
+        gap: 50px;
+    }
+
+    /* 盤面やピースの調整（Step7など） */
+    .board-cell {
+        width: 80px;
+        height: 80px;
+    }
+    .draggable-piece {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 400px) {
+    .title-text {
+        font-size: 1.8rem;
+    }
+
+    .menu-btn {
+        font-size: 1.2rem;
+    }
+
+    .header h2 {
+        font-size: 1.0rem;
+    }
+
+    .footer-speech-bubble {
+        font-size: 0.95rem;
+    }
+
+    /* さらに小さな画面での調整 */
+    .target-container,
+    .step6-model-container,
+    .interactive-piece-container,
+    #step7-target-container,
+    .choice-btn {
+        width: clamp(100px, 25vmin, 150px);
+        height: clamp(100px, 25vmin, 150px);
+    }
 }

@@ -3,77 +3,173 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>形合わせパズル (Shape Matching Puzzle)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>オコジョ先生のかたちあわせ</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts for a nice playful font -->
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
-
-    <div id="game-container">
-
-        <header>
-            <button id="settings-btn" aria-label="設定 (Settings)">⚙️</button>
-            <h1>かたちあわせ</h1>
-            <button id="reset-btn" class="hidden">もういちど</button>
-        </header>
-
-        <!-- Hidden SVG Definitions to be used by both Holes and Pieces -->
-        <svg width="0" height="0" style="position: absolute;">
-            <defs>
-                <path id="shape-circle" d="M50,50 m-40,0 a40,40 0 1,0 80,0 a40,40 0 1,0 -80,0" />
-                <polygon id="shape-triangle" points="50,15 90,85 10,85" />
-                <rect id="shape-square" x="15" y="15" width="70" height="70" rx="5" ry="5" />
-                <polygon id="shape-rhombus" points="50,10 90,50 50,90 10,50" />
-                <polygon id="shape-pentagon" points="50,10 90,40 75,90 25,90 10,40" />
-                <path id="shape-cross" d="M35,10 h30 v25 h25 v30 h-25 v25 h-30 v-25 h-25 v-30 h25 z" />
-            </defs>
-        </svg>
-
-        <div id="board">
-            <!-- The holes where pieces need to be dropped -->
-            <!-- Populated by JS -->
-        </div>
-
-        <div id="tray">
-            <!-- The draggable pieces -->
-            <!-- Populated by JS -->
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="modal hidden">
-        <div class="modal-content">
-            <h2>せんせい モード (Settings)</h2>
-
-            <div class="setting-group">
-                <h3>かず (Count)</h3>
-                <input type="range" id="shape-count" min="1" max="6" value="6">
-                <span id="shape-count-val">6</span>
+    <div id="app-container">
+        <!-- Title Screen -->
+        <div id="title-screen" class="screen active">
+            <div class="settings-btn-wrapper">
+                <button class="settings-btn" id="open-settings-btn" onclick="openSettings()">⚙️ 設定</button>
             </div>
-
-            <div class="setting-group">
-                <h3>かたち と いろ (Shapes & Colors)</h3>
-                <div id="shape-settings-list">
-                    <!-- Javascript will populate this -->
+            <h1 class="title-text">オコジョせんせいの<br>かたちあわせ</h1>
+            <img src="okojo.jpg" alt="オコジョ先生" class="character-img">
+            <div class="menu-container">
+                <div class="game-mode-section">
+                    <div class="mode-title">おなじかたちを さがそう <span id="crown-5" class="crown-icon"></span></div>
+                    <div class="level-btn-container">
+                        <button class="level-btn" id="btn-5-1" onclick="startStep(5, 1)">レベル 1</button>
+                        <button class="level-btn" id="btn-5-2" onclick="startStep(5, 2)">レベル 2</button>
+                        <button class="level-btn" id="btn-5-3" onclick="startStep(5, 3)">レベル 3</button>
+                    </div>
+                </div>
+                <div class="game-mode-section">
+                    <div class="mode-title">まわして あわせよう <span id="crown-6" class="crown-icon"></span></div>
+                    <div class="level-btn-container">
+                        <button class="level-btn" id="btn-6-1" onclick="startStep(6, 1)">レベル 1</button>
+                        <button class="level-btn" id="btn-6-2" onclick="startStep(6, 2)">レベル 2</button>
+                        <button class="level-btn" id="btn-6-3" onclick="startStep(6, 3)">レベル 3</button>
+                    </div>
+                </div>
+                <div class="game-mode-section">
+                    <div class="mode-title">まわして さがそう <span id="crown-7" class="crown-icon"></span></div>
+                    <div class="level-btn-container">
+                        <button class="level-btn" id="btn-7-1" onclick="startStep(7, 1)">レベル 1</button>
+                        <button class="level-btn" id="btn-7-2" onclick="startStep(7, 2)">レベル 2</button>
+                        <button class="level-btn" id="btn-7-3" onclick="startStep(7, 3)">レベル 3</button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="modal-actions">
-                <button id="save-settings">ほぞん (Save)</button>
-                <button id="cancel-settings" class="secondary">キャンセル (Cancel)</button>
+        <!-- Level Clear Modal -->
+        <div id="clear-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <img src="okojo.jpg" alt="オコジョ先生" class="modal-character-img">
+                <div class="modal-speech-bubble" id="modal-message">
+                    よくできたね！<br>つぎの レベルに すすむよ！
+                </div>
+                <button class="modal-btn" id="modal-next-btn" onclick="nextLevelFromModal()">つぎへ</button>
             </div>
         </div>
-    </div>
 
-    <!-- Win Overlay -->
-    <div id="win-overlay" class="modal hidden">
-        <div class="modal-content win-content">
-            <h2>🎉 よくできました！ 🎉</h2>
-            <div style="font-size: 3rem; margin: 20px;">⭐ ⭐ ⭐</div>
-            <button id="play-again-btn">もういちど あそぶ</button>
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal-overlay hidden">
+            <div class="modal-content settings-content">
+                <h2>せってい</h2>
+
+                <div class="settings-section">
+                    <h3>ずけいの いろ</h3>
+                    <div class="color-options">
+                        <label class="color-option">
+                            <input type="radio" name="rail-color" value="#81D4FA" checked onchange="updateSettings()">
+                            <span class="color-swatch" style="background-color: #81D4FA;"></span>
+                        </label>
+                        <label class="color-option">
+                            <input type="radio" name="rail-color" value="#F48FB1" onchange="updateSettings()">
+                            <span class="color-swatch" style="background-color: #F48FB1;"></span>
+                        </label>
+                        <label class="color-option">
+                            <input type="radio" name="rail-color" value="#FFE082" onchange="updateSettings()">
+                            <span class="color-swatch" style="background-color: #FFE082;"></span>
+                        </label>
+                        <label class="color-option">
+                            <input type="radio" name="rail-color" value="#A5D6A7" onchange="updateSettings()">
+                            <span class="color-swatch" style="background-color: #A5D6A7;"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>まわしかた（ステップ6）</h3>
+                    <div class="mode-options">
+                        <label class="mode-option">
+                            <input type="radio" name="rotation-mode" value="tap" checked onchange="updateSettings()">
+                            <span>タップ</span>
+                        </label>
+                        <label class="mode-option">
+                            <input type="radio" name="rotation-mode" value="drag" onchange="updateSettings()">
+                            <span>ドラッグ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="modal-btn" onclick="closeSettings()">とじる</button>
+            </div>
+        </div>
+
+        <!-- Step 5 Screen -->
+        <div id="step5-screen" class="screen">
+            <div class="header">
+                <button class="back-btn" onclick="showTitle()">もどる</button>
+                <div class="level-info">
+                    <span id="step5-level-text" class="level-text">レベル 1</span>
+                    <span id="step5-progress-text" class="progress-text">1 / 5</span>
+                </div>
+                <h2>おなじかたちは どれかな？</h2>
+            </div>
+            <div class="game-area">
+                <div id="target-shape-container" class="target-container"></div>
+                <div id="choices-container" class="choices-container"></div>
+            </div>
+            <!-- アドバイスフッター -->
+            <div class="character-footer">
+                <img src="okojo.jpg" alt="オコジョ先生" class="footer-character-img">
+                <div class="footer-speech-bubble" id="step5-advice">
+                    おなじかたちは どれかな？ ドロップしてみよう！
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6 Screen -->
+        <div id="step6-screen" class="screen">
+            <div class="header">
+                <button class="back-btn" onclick="showTitle()">もどる</button>
+                <div class="level-info">
+                    <span id="step6-level-text" class="level-text">レベル 1</span>
+                    <span id="step6-progress-text" class="progress-text">1 / 5</span>
+                </div>
+                <h2>まわして みほんに かさねよう！</h2>
+            </div>
+            <div class="game-area">
+                <div id="step6-model" class="step6-model-container"></div>
+                <div id="step6-interactive-piece" class="interactive-piece-container">
+                </div>
+            </div>
+            <!-- アドバイスフッター -->
+            <div class="character-footer">
+                <img src="okojo.jpg" alt="オコジョ先生" class="footer-character-img">
+                <div class="footer-speech-bubble" id="step6-advice">
+                    まわして みほんに あわせよう！
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 7 Screen -->
+        <div id="step7-screen" class="screen">
+            <div class="header">
+                <button class="back-btn" onclick="showTitle()">もどる</button>
+                <div class="level-info">
+                    <span id="step7-level-text" class="level-text">レベル 1</span>
+                    <span id="step7-progress-text" class="progress-text">1 / 5</span>
+                </div>
+                <h2>まわして おなじ かたちを さがそう！</h2>
+            </div>
+            <div class="game-area step7-area">
+                <div id="step7-target-container" class="target-container"></div>
+                <div id="step7-choices-container" class="choices-container"></div>
+            </div>
+            <!-- アドバイスフッター -->
+            <div class="character-footer">
+                <img src="okojo.jpg" alt="オコジョ先生" class="footer-character-img">
+                <div class="footer-speech-bubble" id="step7-advice">
+                    くるくるまわして、おなじかたちを ドロップしよう！
+                </div>
+            </div>
         </div>
     </div>
 
